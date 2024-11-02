@@ -1,0 +1,5 @@
+chat_id:
+  - -1001617667985
+  - -1001379334982
+bot_name: FascioSchoolBot
+apis: .env

@@ -1,0 +1,4 @@
+chat_id:
+  - -1001961478667
+bot_name: ChatAnalizerBot
+apis: test.env
