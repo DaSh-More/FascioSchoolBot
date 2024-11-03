@@ -17,7 +17,6 @@ def main():
         "--prod",
         action="store_true",
         help="Запустить в продакшен-режиме",
-        default=False
     )
     args = parser.parse_args()
     print(args.prod)
