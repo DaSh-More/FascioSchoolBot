@@ -1,48 +1,35 @@
 from bestconfig import Config
-from pyrogram import Client, enums, filters
-
-TEST_MODE = False
-
-CONFIG_PATH = "test_config.yaml" if TEST_MODE else "config.yaml"
-
-cfg = Config(CONFIG_PATH, exclude_default=True)
-cfg.insert(cfg.apis)
-
-app = Client(
-    cfg.bot_name, bot_token=cfg.bot_token, api_id=cfg.api_id, api_hash=cfg.api_hash
-)
+from pyrogram import Client
+from handlers import register_handlers
+import argparse
+from loguru import logger
 
 
-@filters.create
-async def from_admin(_, client, query):
-    """
-    Фильтр для проверки является ли пользователь отправивший сообщение администратором
-    """
-    chat_member = await client.get_chat_member(query.chat.id, query.from_user.id)
-    return chat_member.status in (
-        enums.ChatMemberStatus.ADMINISTRATOR,
-        enums.ChatMemberStatus.OWNER,
-    )
-
-
-@app.on_message(
-    filters.command("all", prefixes=["/", "@"]) & filters.chat(cfg.chat_id) & from_admin
-)
-async def tag_all(client, message):
-    """
-    Тегнуть всех пользователей чата
-    """
-    chat_id = message.chat.id
-    tag_all_message = "".join(
-        [
-            f"<a href=tg://user?id={i.user.id}>'</a>"
-            async for i in app.get_chat_members(chat_id)
-        ]
-    )
-    await app.send_message(chat_id, tag_all_message)
+def get_config(prod: False) -> Config:
+    logger.info(f"Start as {'prod' if prod else 'test'}")
+    config_path = "config.yaml" if prod else "test_config.yaml"
+    return Config(config_path, exclude_default=True)
 
 
 def main():
+    parser = argparse.ArgumentParser(description="Запуск бота")
+    parser.add_argument(
+        "--prod",
+        action="store_true",
+        help="Запустить в продакшен-режиме",
+        default=False
+    )
+    args = parser.parse_args()
+    print(args.prod)
+    cfg = get_config(args.prod)
+    cfg.insert(cfg.apis)
+    app = Client(
+        cfg.bot_name,
+        bot_token=cfg.bot_token,
+        api_id=cfg.api_id,
+        api_hash=cfg.api_hash,
+    )
+    register_handlers(app, cfg)
     app.run()
 
 
