@@ -3,7 +3,7 @@ from pyrogram import Client, enums, filters
 
 TEST_MODE = False
 
-CONFIG_PATH = "test_confit.yaml" if TEST_MODE else "confit.yaml"
+CONFIG_PATH = "test_config.yaml" if TEST_MODE else "config.yaml"
 
 cfg = Config(CONFIG_PATH, exclude_default=True)
 cfg.insert(cfg.apis)
@@ -31,7 +31,7 @@ async def from_admin(_, client, query):
 async def tag_all(client, message):
     """
     Тегнуть всех пользователей чата
-    """    
+    """
     chat_id = message.chat.id
     tag_all_message = "".join(
         [
