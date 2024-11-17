@@ -1,18 +1,9 @@
-from pyrogram import Client, enums, filters
+from pyrogram import Client, filters
 from pyrogram.handlers import MessageHandler
 from bestconfig import Config
 
-
-@filters.create
-async def from_admin(_, client, message):
-    """
-    Фильтр для проверки является ли пользователь отправивший сообщение администратором
-    """
-    chat_member = await client.get_chat_member(message.chat.id, message.from_user.id)
-    return chat_member.status in (
-        enums.ChatMemberStatus.ADMINISTRATOR,
-        enums.ChatMemberStatus.OWNER,
-    )
+from utils.database import Database
+from utils.filters import from_group_admin
 
 
 def tag_all(config: Config):
@@ -34,11 +25,12 @@ def tag_all(config: Config):
         tag_all_wrap,
         filters.command("all", prefixes=["/", "@"])
         & filters.chat(config.chat_id)
-        & from_admin,
+        & from_group_admin,
     )
 
     return tag_all_
 
 
-def register_handlers_group(app: Client, config: Config):
-    app.add_handler(tag_all(config))
+def register_handlers_group(app: Client, config: Config, database: Database):
+    # app.add_handler(tag_all(config))
+    ...
